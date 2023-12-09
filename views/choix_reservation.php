@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Choix de Service</title>
+  <title>Choix de Reservation</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
   <div class="container">
-    <h1>Choisissez Votre Service</h1>
+    <h1>Choisissez Votre Reservation</h1>
 
     <div class="service-buttons">
       <a href="addReservationCoach.php" class="submit-button">Coach Sportif</a>
