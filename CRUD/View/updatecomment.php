@@ -1,82 +1,67 @@
 <?php
-
-include '../Controller/forumcont.php';
+include '../Controller/forumcont.php'; // Adjust the path as needed
 $forumController = new ForumController();
 
-// Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (
-        isset($_POST["commentId"]) &&
-        isset($_POST["commentContent"])
-    ) {
-        $commentId = $_POST["commentId"];
-        $commentContent = $_POST["commentContent"];
+    if (isset($_POST["commentContent"]) && isset($_POST["commentId"])) {
+        if (!empty($_POST["commentContent"]) && !empty($_POST["commentId"])) {
+            // Create a Comment object
+            $comment = new Comment(
+                $_POST["commentId"],
+                null,
+                $_POST["commentContent"],
+                null
+            );
 
-        if (isValidContent($commentContent)) {
-            $success = $forumController->updateComment($commentId, $commentContent);
+            $success = $forumController->updateComment($comment);
 
             if ($success) {
-                header("Location: listPosts.php"); // Redirect to wherever you want after updating
+                header("Location: listpost.php?id=" . $_POST["postId"]);
                 exit();
-            } else {
-                echo "Failed to update comment. Please try again.";
-            }
+            } 
         } else {
             echo "Comment content is required.";
         }
     }
 }
 
-// Function to check if content is valid
-function isValidContent($content) {
-    return !empty($content) && strlen($content) >= 3;
-}
+// Retrieve the comment to be updated
+if (isset($_GET['id']) && isset($_GET['postId'])) {
+    $comment = $forumController->getCommentById($_GET['id']);
 
-// Retrieve comment details
-if (isset($_GET['id'])) {
-    $commentId = $_GET['id'];
-    $comment = $forumController->getCommentById($commentId);
+    if ($comment) {
+        $postId = $_GET['postId'];
+        ?>
+        <!DOCTYPE html>
+        <html lang="en">
 
-    if (!$comment) {
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Update Comment</title>
+        </head>
+
+        <body>
+            <button><a href="listpost.php?id=<?= $postId; ?>">Back to list</a></button>
+            <hr>
+
+            <form action="" method="POST">
+                <input type="hidden" name="commentId" value="<?= $comment->getId(); ?>">
+                <input type="hidden" name="postId" value="<?= $postId; ?>">
+                <label for="commentContent">Comment:</label>
+                <textarea id="commentContent" name="commentContent"><?= htmlspecialchars($comment->getPostId()); ?></textarea><br>
+                <input type="submit" value="Update Comment">
+                <input type="reset" value="Reset">
+            </form>
+
+        </body>
+
+        </html>
+    <?php
+    } else {
         echo "Comment not found.";
-        exit();
     }
 } else {
-    echo "Comment ID not provided.";
-    exit();
+    echo "Comment ID or Post ID not provided.";
 }
-
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Comment</title>
-</head>
-
-<body>
-    <button><a href="listPosts.php">Back to list</a></button>
-    <hr>
-
-    <?php
-    if (isset($comment)) {
-    ?>
-
-        <form action="" method="POST">
-            <input type="hidden" name="commentId" value="<?php echo $comment->getId(); ?>">
-            <label for="commentContent">Comment:</label>
-            <textarea id="commentContent" name="commentContent"><?php echo htmlspecialchars($comment->getContent()); ?></textarea><br>
-            <input type="submit" value="Update Comment">
-            <input type="reset" value="Reset">
-        </form>
-
-    <?php
-    }
-    ?>
-
-</body>
-
-</html>

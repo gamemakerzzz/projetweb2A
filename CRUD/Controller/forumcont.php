@@ -156,20 +156,79 @@ public function deleteComment($commentId)
 
 public function updateComment(Comment $comment)
 {
-    $sql = "UPDATE comments SET author = :author, content = :content WHERE id = :id";
+    $sql = "UPDATE comments SET content = :content WHERE id = :id";
     $db = config::getConnexion();
     $query = $db->prepare($sql);
 
     try {
         $query->execute([
             'id' => $comment->getId(),
-            'author' => $comment->getAuthor(),
             'content' => $comment->getContent(),
         ]);
 
         echo $query->rowCount() . " records UPDATED successfully <br>";
     } catch (PDOException $e) {
         echo 'Error: ' . $e->getMessage();
+    }
+}
+
+public function getCommentById($commentId)
+{
+    $sql = "SELECT * FROM comments WHERE id = :id";
+    $db = config::getConnexion();
+
+    try {
+        $query = $db->prepare($sql);
+        $query->bindValue(':id', $commentId);
+        $query->execute();
+
+        $commentData = $query->fetch(PDO::FETCH_ASSOC);
+
+        if (!$commentData) {
+            return null; // Comment not found
+        }
+
+        $comment = new Comment(
+            $commentData['id'],
+            $commentData['post_id'],
+            $commentData['author'],
+            $commentData['content']
+        );
+
+        return $comment;
+    } catch (PDOException $e) {
+        throw new Exception('Failed to get comment by ID: ' . $e->getMessage());
+    }
+}
+
+
+public function getPostsPaginated($offset, $limit)
+{
+    $sql = "SELECT * FROM posts LIMIT :offset, :limit";
+    $db = config::getConnexion();
+    
+    try {
+        $query = $db->prepare($sql);
+        $query->bindParam(':offset', $offset, PDO::PARAM_INT);
+        $query->bindParam(':limit', $limit, PDO::PARAM_INT);
+        $query->execute();
+
+        $posts = [];
+
+        while ($row = $query->fetch(PDO::FETCH_ASSOC)) {
+            $post = new Post(
+                $row['id'],
+                $row['title'],
+                $row['author'],
+                $row['content']
+            );
+
+            $posts[] = $post;
+        }
+
+        return $posts;
+    } catch (Exception $e) {
+        die('Error:' . $e->getMessage());
     }
 }
 

@@ -11,10 +11,14 @@ if (isset($_GET['id']) && isset($_GET['postId'])) {
     $forumController->deleteComment($commentId);
     
     // Redirect back to the post details page or wherever appropriate
-    header('Location: listpost.php?postId=' . $postId);
+    header('Location: addpost.php?postId=' . $postId);
     exit();
 } else {
     // If the comment ID is not provided, handle the error
     echo "Comment ID not provided.";
+}
+if (isset($_POST["submitDeleteComment"])) {
+    $deleteCommentId = $_POST["deleteCommentId"];
+    $forumController->deleteComment($deleteCommentId);
 }
 ?>

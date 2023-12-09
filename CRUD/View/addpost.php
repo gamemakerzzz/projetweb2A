@@ -1,7 +1,6 @@
 <?php
 include '../Controller/forumcont.php';
 
-
 $forumController = new ForumController();
 
 // Check if the form is submitted
@@ -37,10 +36,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $forumController->addComment($comment);
         }
     }
+    
 }
 
-// Retrieve posts
-$posts = $forumController->getPosts();
+// Pagination settings
+$postsPerPage = 5; // Number of posts per page
+$totalPosts = count($forumController->getPosts());
+$totalPages = ceil($totalPosts / $postsPerPage);
+
+// Get current page
+$currentPage = isset($_GET['page']) ? max(1, min($totalPages, $_GET['page'])) : 1;
+$offset = ($currentPage - 1) * $postsPerPage;
+
+// Retrieve posts for the current page
+$posts = $forumController->getPostsPaginated($offset, $postsPerPage);
 
 ?>
 
@@ -53,41 +62,96 @@ $posts = $forumController->getPosts();
     <title>Discussion Forum</title>
     <link rel="stylesheet" href="styles.css">
     <script>
-        function validatePostForm() {
-            var postTitle = document.getElementById("postTitle").value;
-            var postAuthor = document.getElementById("postAuthor").value;
-            var postContent = document.getElementById("postContent").value;
+       function validatePostForm() {
+    var postTitle = document.getElementById("postTitle").value;
+    var postAuthor = document.getElementById("postAuthor").value;
+    var postContent = document.getElementById("postContent").value;
 
-            if (postTitle.trim() === "" || postAuthor.trim() === "" || postContent.trim() === "") {
-                alert("All fields are required for the post.");
-                return false;
-            }
+    // Check if any field is empty or if username is less than 3 characters
+    if (postTitle.trim() === "" || postAuthor.trim() === "" || postAuthor.trim().length < 3 || postContent.trim() === "") {
+        alert("All fields are required for the post, and the username must be at least 3 characters.");
+        return false;
+    }
+      // Check if the username contains any numbers
+      if (/\d/.test(postAuthor)) {
+        alert("Username cannot contain numbers.");
+        return false;
+    }
 
-            return true;
+    // Check if the title starts with an uppercase letter
+    if (!/^[A-Z]/.test(postTitle)) {
+        alert("Post title must start with an uppercase letter.");
+        return false;
+    }
+
+    return true;
+}
+
+    function validateCommentForm(postId) {
+        var commentAuthor = document.getElementById("commentAuthor" + postId).value;
+        var commentContent = document.getElementById("commentContent" + postId).value;
+
+        // Check if any field is empty or if username is less than 3 characters
+        if (commentAuthor.trim() === "" || commentAuthor.trim().length < 3 || commentContent.trim() === "") {
+            alert("All fields are required for the comment, and the username must be at least 3 characters.");
+            return false;
         }
+        return true;
+    }
+        
 
-        function validateCommentForm(postId) {
-            var commentAuthor = document.getElementById("commentAuthor" + postId).value;
-            var commentContent = document.getElementById("commentContent" + postId).value;
+        function searchPosts() {
+            console.log("Search button clicked");
+        // Get the input value from the search bar
+        var searchInput = document.getElementById("searchInput").value.toLowerCase();
 
-            if (commentAuthor.trim() === "" || commentContent.trim() === "") {
-                alert("All fields are required for the comment.");
-                return false;
+        // Get all post containers
+        var postContainers = document.getElementsByClassName("post-container");
+
+        // Iterate through each post container
+        for (var i = 0; i < postContainers.length; i++) {
+            // Get the post title from the current post container
+            var postTitle = postContainers[i].getElementsByClassName("post-content")[0].getElementsByTagName("h3")[0].innerText.toLowerCase();
+
+            // Show or hide the post container based on the search input
+            if (postTitle.includes(searchInput)) {
+                postContainers[i].style.display = "block"; // Show the post container
+            } else {
+                postContainers[i].style.display = "none"; // Hide the post container
             }
-
-            return true;
         }
+    }
     </script>
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            padding: 8px 16px;
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #007bff;
+            border-radius: 5px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .pagination a.active {
+            background-color: #004080;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-    <h1 style="text-align:center; color: #ff00b3;">The healthy forum</h1>
-    <div class="search-bar">
-      <input type="text" id="searchInput" placeholder="Search by title">
-      <button class="button" onclick="searchPosts()">Search</button>
-    </div>
-        <hr>
+        <h1 style="text-align:center; color: #ff00b3;">The healthy forum</h1>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by title">
+            <button class="button" onclick="searchPosts()">Search</button>
+        </div>
 
         <div class="post-content">
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST" onsubmit="return validatePostForm();">
@@ -118,15 +182,22 @@ $posts = $forumController->getPosts();
                     echo "</form>";
 
                     // Display comments
-                    $comments = $forumController->getCommentsByPost($post->getId());
-                    if (!empty($comments)) {
-                        echo "<div class='comments'>";
-                        echo "<h4>Comments:</h4>";
-                        foreach ($comments as $comment) {
-                            echo "<div class='comment'>";
-                            echo "<p>{$comment->getContent()} says: {$comment->getPostId()}</p>";
-                            echo "</div>";
-                        }
+                     // Display comments with delete button
+                     $comments = $forumController->getCommentsByPost($post->getId());
+                     if (!empty($comments)) {
+                         echo "<div class='comments'>";
+                         echo "<h4>Comments:</h4>";
+                         foreach ($comments as $comment) {
+                             echo "<div class='comment'>";
+                             echo "<p>{$comment->getContent()} says: {$comment->getPostId()}</p>";
+                             echo "<form action='" . htmlspecialchars($_SERVER["PHP_SELF"]) . "' method='POST'>";
+                             echo "<input type='hidden' name='deleteCommentId' value='{$comment->getId()}'>";
+                             echo "<a href='deletecomment.php?id={$comment->getId()}&postId={$post->getId()}'>Delete Comment</a>";
+
+                             echo "</form>";
+                             echo "</div>";
+                         }
+                       
                         echo "</div>";
                     }
 
@@ -137,8 +208,16 @@ $posts = $forumController->getPosts();
                 echo "<p>No posts found.</p>";
             }
             ?>
+
+            <!-- Pagination links -->
+            <div class="pagination">
+                <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                    <a href="?page=<?php echo $i; ?>" <?php if ($i == $currentPage) echo 'class="active"'; ?>><?php echo $i; ?></a>
+                <?php endfor; ?>
+            </div>
         </div>
     </div>
 </body>
 
 </html>
+

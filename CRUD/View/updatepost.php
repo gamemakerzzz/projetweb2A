@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $success = $forumController->updatePost($post);
 
             if ($success) {
-                header('Location: listPosts.php');
+                header('Location: listpost.php');
                 exit();
             } else {
                 echo "Failed to update post. Please try again.";
@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 
 <body>
-    <button><a href="listPosts.php">Back to list</a></button>
+    <button><a href="listpost.php">Back to list</a></button>
     <hr>
 
     <?php
