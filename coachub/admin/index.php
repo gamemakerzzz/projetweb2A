@@ -1,6 +1,34 @@
 <?php
 include '../db_connection.php';
-include 'get_order.php'; 
+include 'get_order.php';
+
+$ordersPerPage = 2;
+
+$searchOrderId = isset($_GET['search']) ? intval($_GET['search']) : null;
+if ($searchOrderId !== null) {
+    $searchResult = array_filter($orders, function ($order) use ($searchOrderId) {
+        return $order['order_id'] == $searchOrderId;
+    });
+
+    if (empty($searchResult)) {
+        echo "<script>alert('Order ID not found.');</script>";
+        echo "<script>window.location.href = 'index.php';</script>";
+        exit;
+    } else {
+        $orders = $searchResult;
+    }
+}                                                                                                                                       
+
+$totalOrders = count($orders);
+
+$totalPages = ceil($totalOrders / $ordersPerPage);
+
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+
+$offset = ($page - 1) * $ordersPerPage;
+
+$paginatedOrders = array_slice($orders, $offset, $ordersPerPage);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,26 +39,24 @@ include 'get_order.php';
     <style>
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #e0f7ec; /* Light green background */
+            background-color: #e0f7ec; 
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
         .container {
-            background-color: #c3f0cb; /* Lighter green container */
+            background-color: #c3f0cb; 
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
             width: 400px;
-            margin: 10px;
+            margin: 20px;
         }
 
         h2 {
             text-align: center;
-            color: #006400; /* Dark green header text */
+            color: #006400;
         }
 
         p {
@@ -38,19 +64,78 @@ include 'get_order.php';
         }
 
         .actions a {
-            color: #006400; /* Dark green links */
+            color: #006400; 
         }
 
         .actions a:hover {
             text-decoration: underline;
         }
+
+        .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+        flex-direction: column;
+        }
+
+        .pagination a {
+            color: #006400;
+            padding: 8px 12px;
+            margin: 0 4px;
+            border: 1px solid #006400;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+
+        .pagination a:hover {
+            background-color: #006400;
+            color: #fff;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 8px;
+            border: 1px solid #006400;
+            border-radius: 4px;
+            margin-right: 8px;
+        }
+
+        .search-button {
+            background-color: #006400;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .return-button {
+            background-color: #006400;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
     </style>
     <title>Healthcare Orders</title>
 </head>
 <body>
+    <div class="search-container">
+        <form action="index.php" method="get">
+            <input type="text" name="search" class="search-input" placeholder="Search by Order ID">
+            <button type="submit" class="search-button">Search</button>
+        </form>
+    </div>
+
     <div class="admin-container">
         <?php
-        foreach ($orders as $order) {
+        foreach ($paginatedOrders as $order) {
             echo "<div class='container'>";
             echo "<h2>Order #{$order['order_id']}</h2>";
             echo "<p><strong>User ID:</strong> {$order['user_id']}</p>";
@@ -67,6 +152,26 @@ include 'get_order.php';
         }
         ?>
     </div>
+
+    <div class="pagination">
+        <?php
+        for ($i = 1; $i <= $totalPages; $i++) {
+            echo "<a href='index.php?page={$i}'>{$i}</a> ";
+        }
+        ?>
+    </div>
+
+    <?php
+    if (isset($searchResult) && empty($searchResult)) {
+        echo "<button class='return-button' onclick='goBack()'>Return</button>";
+    }
+    ?>
+
     <script src="script.js"></script>
+    <script>
+        function goBack() {
+            window.location.href = 'index.php';
+        }
+    </script>
 </body>
 </html>
