@@ -19,7 +19,7 @@ if (
         !empty($_POST["date_reservationPsy"])
     ) {
         $reservation = new PsychiatreReservation(
-            null,  // Leave the database to manage the ID automatically
+            null,
             $_POST['nom'],
             $_POST['prenom'],
             $_POST['email'],
@@ -33,9 +33,13 @@ if (
     }
 }
 
-// The rest of the HTML code for the update form
+if (isset($_GET['idReservation'])) {
+    $idReservation = $_GET['idReservation'];
+    $oldReservation = $reservationC->showReservation($idReservation);
+}
 ?>
 
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -46,70 +50,64 @@ if (
 </head>
 
 <body>
-<div class="container">
-    <button><a href="listReservationsPsy.php">Retour à la liste</a></button>
-    <hr>
+    <div class="container">
+        <button><a href="listReservationsPsy.php">Retour à la liste</a></button>
+        <hr>
 
-    <?php
-    if (isset($_GET['idReservation'])) {
-        $oldReservation = $reservationC->showReservation($_GET['idReservation']);
-    ?>
+        <?php if (isset($_GET['idReservation'])): ?>
+            <?php $oldReservation = $reservationC->showReservation($_GET['idReservation']); ?>
+            <form action="" method="POST">
+                <table>
+                    <tr>
+                        <td><label for="nom">Nom :</label></td>
+                        <td class="icon-field">
+                            <img src="user_img.png" alt="Patient Icon" class="field-icon" />
+                            <input type="text" id="nom" name="nom" required pattern="[A-Za-z]+" value="<?= $oldReservation['nom'] ?>" />
+                            <span id="erreurNom" class="error-message"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="prenom">Prénom :</label></td>
+                        <td class="icon-field">
+                            <img src="user_img.png" alt="Patient Icon" class="field-icon" />
+                            <input type="text" id="prenom" name="prenom" required pattern="[A-Za-z]+" value="<?= $oldReservation['prenom'] ?>" />
+                            <span id="erreurPrenom"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="email">Email :</label></td>
+                        <td class="icon-field">
+                            <img src="email.png" alt="Email Icon" class="field-icon" />
+                            <input type="text" id="email" name="email" required value="<?= $oldReservation['email'] ?>" />
+                            <span id="erreurEmail"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="tel">Téléphone :</label></td>
+                        <td class="icon-field">
+                            <img src="phone.png" alt="Phone Icon" class="field-icon" />
+                            <input type="text" id="telephone" name="tel" required value="<?= $oldReservation['tel'] ?>" />
+                            <span id="erreurTelephone"></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><label for="date_reservationPsy">Date Reservation :</label></td>
+                        <td class="icon-field">
+                            <img src="date.png" alt="Date Icon" class="field-icon" />
+                            <input type="date" id="date_reservationPsy" name="date_reservationPsy" required value="<?= $oldReservation['date_reservationPsy'] ?>" />
+                            <span id="erreurDateReservationPsy"></span>
+                        </td>
+                    </tr>
 
-        <form action="" method="POST">
-            <table>
-                <tr>
-                    <td><label for="nom">Nom :</label></td>
-                    <td class="icon-field">
-                    <img src="user_img.png" alt="Patient Icon" class="field-icon" />
-                    <input type="text" id="nom" name="nom" required pattern="[A-Za-z]+" />
-                    <span id="erreurNom" class="error-message"></span>
+                    <td>
+                        <input type="submit" value="Enregistrer" id="submitBtn">
                     </td>
-                </tr>
-                <tr>
-                    <td><label for="prenom">Prénom :</label></td>
-                    <td class="icon-field">
-                 <img src="user_img.png" alt="Patient Icon" class="field-icon" />
-                <input type="text" id="prenom" name="prenom" required pattern="[A-Za-z]+" />
-                    <span id="erreurPrenom"></span>
+                    <td>
+                        <input type="reset" value="Réinitialiser">
                     </td>
-                </tr>
-                <tr>
-                    <td><label for="email">Email :</label></td>
-                    <td class="icon-field">
-                <img src="email.png" alt="Email Icon" class="field-icon" />
-               <input type="text" id="email" name="email" required />
-                <span id="erreurEmail"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="tel">Téléphone :</label></td>
-                    <td class="icon-field">
-                     <img src="phone.png" alt="Phone Icon" class="field-icon" />
-                  <input type="text" id="telephone" name="tel" required />
-                    <span id="erreurTelephone"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td><label for="date_reservationPsy">Date Reservation :</label></td>
-                    <td class="icon-field">
-        <img src="date.png" alt="Date Icon" class="field-icon" />
-        <input type="date" id="date_reservationPsy" name="date_reservationPsy" required />
-        <span id="erreurDateReservationPsy"></span>
-                    </td>
-                </tr>
-
-                <td>
-                <input type="submit" value="Enregistrer" id="submitBtn">
-                </td>
-                <td>
-                    <input type="reset" value="Réinitialiser">
-                </td>
-            </table>
-
-        </form>
-    <?php
-    }
-    ?>
+                </table>
+            </form>
+        <?php endif; ?>
     </div>
 </body>
 
