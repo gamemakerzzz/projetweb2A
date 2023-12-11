@@ -14,31 +14,34 @@
 
             <h3>Products</h3>
             <label class="product-label">
-                <input type="checkbox" name="products[]" value="Product 1">
-                <img src="favicon.png" alt="Product 1" width="50">
-                <span class="product-info">
-                    <strong>Product 1</strong><br>
-                    Price: 40.00TND<br>
-                    Description: Lorem ipsum dolor sit amet.
-                </span>
+            <input type="checkbox" name="products[Product1][quantity]" value="1">
+            <img src="favicon.png" alt="Product 1" width="50">
+            <span class="product-info">
+                <strong>Product 1</strong><br>
+                Price: 40.00TND<br>
+                Description: Lorem ipsum dolor sit amet.
+            </span>
+            <input type="number" name="products[Product1][quantity]" value="1" min="1">
             </label>
             <label class="product-label">
-                <input type="checkbox" name="products[]" value="Product 2">
+                <input type="checkbox" name="products[Product2][quantity]" value="1">
                 <img src="favicon.png" alt="Product 2" width="50">
                 <span class="product-info">
                     <strong>Product 2</strong><br>
                     Price: 15.50TND<br>
                     Description: Lorem ipsum dolor sit amet.
                 </span>
+                <input type="number" name="products[Product2][quantity]" value="1" min="1">
             </label>
             <label class="product-label">
-                <input type="checkbox" name="products[]" value="Product 3">
+                <input type="checkbox" name="products[Product3][quantity]" value="1">
                 <img src="favicon.png" alt="Product 3" width="50">
                 <span class="product-info">
                     <strong>Product 3</strong><br>
                     Price: 39.90TND<br>
                     Description: Lorem ipsum dolor sit amet.
                 </span>
+                <input type="number" name="products[Product3][quantity]" value="1" min="1">
             </label>
             <hr>
 

@@ -12,16 +12,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$deliveryAddress, $phoneNumber, $deliveryDate, $specialInstructions]);
 
         $lastOrderId = $conn->lastInsertId();
+
         if (isset($_POST['products']) && is_array($_POST['products'])) {
-
-            foreach ($_POST['products'] as $product) {
-                $quantity = 1;
-
-                $price = 50;
+            foreach ($_POST['products'] as $productName => $productDetails) {
+                $quantity = $productDetails['quantity'];
+                $price = 50; // Replace with your default price or logic to determine the price
                 $totalPrice = $quantity * $price;
 
-                $stmt = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, total_price) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$lastOrderId, $product, $quantity, $totalPrice]);
+                $stmtOrderItems = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, total_price) VALUES (?, ?, ?, ?)");
+                $stmtOrderItems->execute([$lastOrderId, $productName, $quantity, $totalPrice]);
             }
         }
 
@@ -30,3 +29,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo "Error: " . $e->getMessage();
     }
 }
+?>
