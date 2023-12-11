@@ -1,0 +1,99 @@
+/* Style pour le formulaire */
+form {
+    width: 80%;
+    margin: auto;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Style pour le titre de la page */
+h1 {
+    text-align: center;
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Style pour les liens */
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+/* Style pour les boutons */
+button, input[type="submit"], input[type="reset"] {
+    background-color: #555;
+    border: none;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+button:hover, input[type="submit"]:hover, input[type="reset"]:hover {
+    background-color: #222;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Style pour la table */
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #333;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Style pour le champ de sélection */
+select {
+    padding: 10px;
+    border: 1px solid #726d6d;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 16px;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Cpath d='M30.3 7.3c-.4-.4-1-.4-1.4 0L16 20.6 3.1 7.7c-.4-.4-1-.4-1.4 0-.4.4-.4 1 0 1.4l13.4 13.4c.4.4 1 .4 1.4 0l13.4-13.4c.4-.4.4-1 0-1.4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+}
+
+/* Style pour le champ de texte */
+input[type="text"], textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    font-size: 16px;
+    width: 100%;
+}
+
+/* Style pour les animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Appliquer l'animation aux éléments spécifiés */
+button, input[type="submit"], input[type="reset"], table {
+    animation: fadeIn 0.5s ease-in-out;
+}
